@@ -1,8 +1,0 @@
-_disp_init: CODE, 1812 0 232
-_dly_ms: CODE, 1725 0 20
-_main: CODE, 1745 0 67
-_iic_start: CODE, 1702 0 7
-__initialization: CODE, 2044 0 0
-_iic_write: CODE, 1716 0 9
-_iic_stop: CODE, 1709 0 7
-Total: 342

@@ -4,21 +4,16 @@
 #include "string.h"
 #include "helper.h"
 
-void send_usart (unsigned char data);
-void send_usart_s (unsigned char * str);
-unsigned char read_memory (unsigned int addr);
-void write_memory (unsigned int addr, unsigned char data);
-unsigned char adc_setup (unsigned char res, unsigned char chnl);
-unsigned long adc_get_data (unsigned char res);
-unsigned char adc_spi (unsigned char data);
-void adc_write_reg (unsigned char addr, unsigned char data);
-unsigned char adc_read_reg (unsigned char addr);
+void print_meas_val (float val, unsigned char bpoint, unsigned char apoint, unsigned char x, unsigned char y, unsigned char * suffix);
+float calc_quad_corr (float input, float * cf);
 
-
-
-unsigned long test;
-unsigned char channel,addr,val,str[20];
-float x;
+int adc_A, adc_B;
+unsigned char channel,addr,val,range,gain_b;
+float voltage_A, voltage_B, current_A, resistance_A, resistance_X;
+unsigned char t_str[10];
+unsigned long counter;
+//float qcorr_AA,qcorr_AB,qcorr_AC;
+float qcorr_A[3];
 
 void main(void) 
 {
@@ -27,122 +22,59 @@ disp_init();
 
 adc_write_reg (3,0x02);
 adc_write_reg (2,0x10);
-adc_write_reg (0,0x51);
-
+//adc_write_reg (0,0x51);
 disp_clr(0);
+disp_set_xy(0,0);
+disp_puts("uProgMeter");
+counter = 0;
+range = 1;
+gain_b = 0;
 
-for (addr=0;addr<3;addr++)
-	{
-	disp_set_xy(addr*3,addr);
-	disp_puts("abcd1234 ");
-	}
-/*
-x = 233.8878971;
-xftoa(x,str,4);
-disp_set_xy(0,3);
-disp_puts(str);
-*/
-
-channel = 0;
-addr = 5;
-
+qcorr_A[0] = -0.000594;
+qcorr_A[1] = -0.008438;
+qcorr_A[2] = 0.0317;
 while (1)
 	{
-	//adc_setup(0,channel);
-	if (addr<4)
+	if (range==1) resistance_A = 6.80;
+	if (range==2) resistance_A = 470.00;
+	meter_res_range(range);
+	adc_A = adc_get_data(0,0);
+	voltage_A = 1.0 * (adc_A * 2.048) / 32767.0;
+	current_A = voltage_A / resistance_A;
+	print_meas_val(voltage_A,2,3,0,1," V ");
+	print_meas_val(current_A,2,3,0,2," mA");
+	adc_B = adc_get_data(1,gain_b);
+	voltage_B = 11.0 * (adc_B * 2.048) / 32767.0;
+	voltage_B = voltage_B + calc_quad_corr (voltage_B,qcorr_A);
+	print_meas_val(voltage_B,2,3,0,0," V ");
+	if (adc_A>300)
 		{
-		adc_write_reg (addr,val);
-		addr = 5;
+		resistance_X = voltage_B / current_A;
+		print_meas_val(resistance_X,1,2,0,3," kO ");
 		}
-	
-	test = adc_get_data(1);
-	x = 11.0 * (test * 2.048) / 32767.0;
-	xftoa(x,str,4);
-	disp_set_xy(0,3);
-	disp_puts(str);
-
-//	adc_write_reg (0,0x55);
-//	channel = adc_read_reg (0);
 	}
 }
 
-
-
-/*
-unsigned char adc_get_drdy (void)
+float calc_quad_corr (float input, float * cf)
 	{
-	if (ADC_DO_I==0)
-		return 0;
-	else
-		return 1;
+	return ((cf[0] * input * input) + (cf[1]*input) + (cf[2])); //when in doubt, use parentheses
 	}
-*/
-unsigned char adc_spi (unsigned char data)
+
+void print_meas_val (float val, unsigned char bpoint, unsigned char apoint, unsigned char x, unsigned char y, unsigned char * suffix)
 	{
-	unsigned char i,din;
-	din = 0;
-	for (i=0;i<8;i++)
+	unsigned char i;
+	if (val<0.0) 
 		{
-		if (data&0x80)
-			ADC_DI = 1;
-		else
-			ADC_DI = 0;
-		data = data<<1;
-		ADC_CLK = 1;
-		ADC_DELAY;
-		ADC_CLK = 0;
-		ADC_DELAY;
-		din = din<<1;
-		if (ADC_DO_I==1)
-			din = din|0x01;
+		t_str[0] = '-';
+		val = -val;
 		}
-	return din;
-	}
-
-volatile unsigned char d1,d2,d3;
-
-void adc_write_reg (unsigned char addr, unsigned char data)
-	{
-	d1 = ((addr&0x03)<<2)|0x40;
-	ADC_CS = 0;
-	adc_spi(d1);
-	adc_spi(data);
-	ADC_CS = 1;
-	}
-
-unsigned char adc_read_reg (unsigned char addr)
-	{
-	d1 = ((addr&0x03)<<2)|0x20;
-	ADC_CS = 0;
-	adc_spi(d1);
-	d1 = adc_spi(0);
-	ADC_CS = 1;
-	return d1;
-	}
-
-
-unsigned char config;
-unsigned char adc_setup (unsigned char res, unsigned char chnl)
-	{
-	
-	}
-
-
-unsigned long retval;
-unsigned long adc_get_data (unsigned char res)
-	{
-	
-	ADC_CS = 0;
-	adc_spi(0x08);
-	while (ADC_DO_I!=0);
-	adc_spi(0x10);
-	d1 = adc_spi(0);
-	d2 = adc_spi(0);
-	ADC_CS = 1;
-	retval = d1;
-	retval = retval << 8;
-	retval = retval | d2;
-	return retval;
+	else
+		t_str[0] = ' ';
+	i = xftoa(val,t_str+1,bpoint,apoint) + 1;
+	while (*suffix!=0)
+		t_str[i++] = *suffix++;
+	disp_set_xy(x,y);
+	disp_puts(t_str);
 	}
 
 

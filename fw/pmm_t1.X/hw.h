@@ -1,5 +1,10 @@
+//this is where compilers switching occurs
+#ifdef __XC8 
+#define	COMPILER_XC8
+#endif
+#ifndef __XC8 
 #define	COMPILER_SDCC
-//#define	COMPILER_XC8
+#endif
 
 
 #define	_XTAL_FREQ	(2000000*1)
@@ -103,4 +108,10 @@ void iic_rstart (void);
 void iic_write (unsigned char data);
 unsigned char iic_read (unsigned char ack);
 void dly_ms(unsigned int i);
+unsigned char adc_setup (unsigned char res, unsigned char chnl);
+unsigned int adc_get_data (unsigned char channel, unsigned char gain);
+unsigned char adc_spi (unsigned char data);
+void adc_write_reg (unsigned char addr, unsigned char data);
+unsigned char adc_read_reg (unsigned char addr);
+void meter_res_range (unsigned char range);
 

@@ -8,7 +8,6 @@
 //****************************************************************************
 
 int intToStr(int x, char str[], int d);
-void xftoa(float n, char *res, int afterpoint);
 void reverse(char *str, int len);
 
 // reverses a string 'str' of length 'len'
@@ -31,7 +30,7 @@ int intToStr(int x, char str[], int d)
 {
     int i = 0;
 	int k = 0;
-	for (i=0;i<50;i++)	//meh
+	for (i=0;i<50;i++)	//this is ugly, isn't it?
 		{
 		if (x>0)
 			{
@@ -68,26 +67,26 @@ ftoa(1.555, str, 0) should store "1" in res.
 
 const unsigned int ten_powers[5] = {1,10,100,1000,10000};
 // Converts a floating point number to string.
-void xftoa(float n, char *res, int afterpoint)
+unsigned char xftoa(float n, char *res, unsigned char bpoint, unsigned char apoint)
 {
     // Extract integer part
     int ipart = (int)n;
     // Extract floating part
     float fpart = n - (float)ipart;
     // convert integer part to string
-    int i = intToStr(ipart, res, 2);
+    int i = intToStr(ipart, res, bpoint);
     // check for display option after point
-    if (afterpoint != 0)
+    if (apoint != 0)
     {
         res[i] = '.';  // add dot
         // Get the value of fraction part upto given no.
         // of points after dot. The third parameter is needed
         // to handle cases like 233.007
         //fpart = fpart * powd(10, afterpoint);
-		fpart = fpart * ten_powers[afterpoint];
-        intToStr((int)fpart, res + i + 1, afterpoint);
+		fpart = fpart * ten_powers[apoint];
+        intToStr((int)fpart, res + i + 1, apoint);
     }
-	
+return i + 	apoint + 1;
 }
 
 /*
