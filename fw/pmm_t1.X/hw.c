@@ -1,4 +1,5 @@
 #include "hw.h"
+#include "disp.h"
 #include <stdint.h> 
 
 #ifdef  COMPILER_SDCC
@@ -25,7 +26,7 @@ void dly_ms(unsigned int i)
 #pragma config MCLRE = ON       // MCLR Pin Function Select (MCLR/VPP pin function is MCLR)
 #pragma config CP = OFF         // Flash Program Memory Code Protection (Program memory code protection is disabled)
 #pragma config CPD = OFF        // Data Memory Code Protection (Data memory code protection is disabled)
-#pragma config BOREN = ON      // Brown-out Reset Enable (Brown-out Reset disabled)
+#pragma config BOREN = OFF      // Brown-out Reset Enable (Brown-out Reset disabled)
 #pragma config CLKOUTEN = OFF   // Clock Out Enable (CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin)
 #pragma config IESO = ON        // Internal/External Switchover (Internal/External Switchover mode is enabled)
 #pragma config FCMEN = ON       // Fail-Safe Clock Monitor Enable (Fail-Safe Clock Monitor is enabled)
@@ -57,8 +58,8 @@ void hw_init (void)
 	OSCCON = 0x60;
 	
 	ANSELA = 0;
-	ANSELB = 0x80;
-	ANSELC = 0x80;
+	ANSELB = 0x00;
+	ANSELC = 0xC8;
 
 	DISP_PWR_T = 0;
 	DISP_PWR = 0;
@@ -84,14 +85,32 @@ void hw_init (void)
 	SSP1STAT = 0x00;
 	SSP1ADD = SSP_BRG;
 	dly_ms(100);
+/*	
+	T1CON = 0x01;
+	PIE1 = 0x80;
+	INTCON = 0xC0;
+	*/
+	OPTION_REG = 0x82;
+	INTCON = 0xE0;
+	
 	}
 
+/*
 void iic_start (void)
 {
 SSP_SEN = 1;
 while (SSP_IF==0);
 SSP_IF = 0;
 }
+*/
+void iic_start_addr (unsigned char address)
+{
+SSP_SEN = 1;
+while (SSP_IF==0);
+SSP_IF = 0;
+iic_write(address);
+}
+
 
 void iic_stop (void)
 {
@@ -150,7 +169,7 @@ unsigned char adc_spi (unsigned char data)
 	return din;
 	}
 
-volatile unsigned char d1,d2,d3;
+unsigned char d1,d2,d3;
 
 void adc_write_reg (unsigned char addr, unsigned char data)
 	{
@@ -175,11 +194,13 @@ unsigned char adc_read_reg (unsigned char addr)
 unsigned int retval;
 unsigned int adc_get_data (unsigned char channel, unsigned char gain)
 	{
-    if (channel!=0)                         //channel is 0 or 1
-        channel = 0x50;						//zero is luckily also combination for AN0/AN1
-											//0x50 is base for AN2/AN3
-    channel = channel | (gain<<1) | 0x01;	//now add gain bits and disable PGA
-	adc_write_reg (0,channel);
+	
+	d1 = 0x01;						//disable PGA by default
+    if (channel)                         //channel is 0 or 1
+        d1 = 0x51;						//zero is luckily also combination for AN0/AN1
+											//0x51 is base for AN2/AN3 without PGA
+    d1 = d1 | (gain<<1);	//now add gain bits
+	adc_write_reg (0,d1);
 	ADC_CS = 0;
 	adc_spi(0x08);							//start conversion and wait
 	while (ADC_DO_I!=0);
@@ -198,13 +219,28 @@ unsigned int get_adc (unsigned char chnl)
 	{
 	ADCON0 = (chnl<<2)|0x01;
 	ADCON1 = 0xF0;
-	PIR1bits.ADIF = 0;
-	GO_nDONE = 1;
-	while (GO_nDONE==1);
-	PIR1bits.ADIF = 0;
+	ADCON0 = ADCON0|0x02;
+	while (ADCON0&0x02);
 	return ADRES;
 	}
 */
+void start_adc (unsigned char chnl)
+	{
+	ADCON0 = (chnl<<2)|0x01;
+	ADCON1 = 0xF0;
+	ADCON0 = ADCON0|0x02;
+	}
+
+unsigned int get_adc (void)
+	{
+	unsigned int tmp;
+	tmp = ADRESH;
+	tmp = tmp<<8;
+	tmp = tmp | ADRESL;
+	return tmp;
+	}
+
+
 void meter_res_range (unsigned char range)
 	{
 	if (range==1)	//low res range
@@ -229,3 +265,34 @@ void meter_res_range (unsigned char range)
 	
 	}
 
+void shdn (void)
+	{
+	while (JOY_BTN_M==0);
+	iic_start_addr(Write_Address);
+	iic_write(0x80);
+	iic_write(0xae);
+	iic_stop();
+	
+	ADC_CS = 0;
+	adc_spi(0x02);
+	ADC_CS = 1;
+
+	ADCON0 = 0;
+
+	MUX2 = 1;
+	MUX3 = 1;	
+	MUX1 = 0;	
+	PAN_EN = 0;
+	DISP_PWR = 0;
+	
+	ICD_PGD_T = 0;
+	ICD_PGC_T = 0;
+	
+	IOCBN = 0x80;
+	IOCBF = 0x00;
+	INTCON = 0x08;
+
+	mSLEEP;
+	mRESET;
+	
+	}

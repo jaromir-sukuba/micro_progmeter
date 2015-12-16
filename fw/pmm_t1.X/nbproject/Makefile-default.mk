@@ -28,13 +28,13 @@ CP=cp
 CND_CONF=default
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 IMAGE_TYPE=debug
-OUTPUT_SUFFIX=elf
-DEBUGGABLE_SUFFIX=elf
+OUTPUT_SUFFIX=cof
+DEBUGGABLE_SUFFIX=
 FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 else
 IMAGE_TYPE=production
-OUTPUT_SUFFIX=hex
-DEBUGGABLE_SUFFIX=elf
+OUTPUT_SUFFIX=cof
+DEBUGGABLE_SUFFIX=
 FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 endif
 
@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c hw.c disp.c helper.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c hw.c disp.c helper.c interrupt.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.p1 ${OBJECTDIR}/hw.p1 ${OBJECTDIR}/disp.p1 ${OBJECTDIR}/helper.p1
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.p1.d ${OBJECTDIR}/hw.p1.d ${OBJECTDIR}/disp.p1.d ${OBJECTDIR}/helper.p1.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/hw.o ${OBJECTDIR}/disp.o ${OBJECTDIR}/helper.o ${OBJECTDIR}/interrupt.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/hw.o.d ${OBJECTDIR}/disp.o.d ${OBJECTDIR}/helper.o.d ${OBJECTDIR}/interrupt.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.p1 ${OBJECTDIR}/hw.p1 ${OBJECTDIR}/disp.p1 ${OBJECTDIR}/helper.p1
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/hw.o ${OBJECTDIR}/disp.o ${OBJECTDIR}/helper.o ${OBJECTDIR}/interrupt.o
 
 # Source Files
-SOURCEFILES=main.c hw.c disp.c helper.c
+SOURCEFILES=main.c hw.c disp.c helper.c interrupt.c
 
 
 CFLAGS=
@@ -77,96 +77,72 @@ ifneq ($(INFORMATION_MESSAGE), )
 endif
 	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
-MP_PROCESSOR_OPTION=16LF1829
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/main.p1.d 
-	@${RM} ${OBJECTDIR}/main.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  -D__DEBUG=1 --debugger=icd3  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/main.p1  main.c 
-	@-${MV} ${OBJECTDIR}/main.d ${OBJECTDIR}/main.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/main.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/main.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 main.c  -o${OBJECTDIR}/main.o
 	
-${OBJECTDIR}/hw.p1: hw.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/hw.p1.d 
-	@${RM} ${OBJECTDIR}/hw.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  -D__DEBUG=1 --debugger=icd3  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/hw.p1  hw.c 
-	@-${MV} ${OBJECTDIR}/hw.d ${OBJECTDIR}/hw.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/hw.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/hw.o: hw.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/hw.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 hw.c  -o${OBJECTDIR}/hw.o
 	
-${OBJECTDIR}/disp.p1: disp.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/disp.p1.d 
-	@${RM} ${OBJECTDIR}/disp.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  -D__DEBUG=1 --debugger=icd3  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/disp.p1  disp.c 
-	@-${MV} ${OBJECTDIR}/disp.d ${OBJECTDIR}/disp.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/disp.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/disp.o: disp.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/disp.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 disp.c  -o${OBJECTDIR}/disp.o
 	
-${OBJECTDIR}/helper.p1: helper.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/helper.p1.d 
-	@${RM} ${OBJECTDIR}/helper.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  -D__DEBUG=1 --debugger=icd3  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/helper.p1  helper.c 
-	@-${MV} ${OBJECTDIR}/helper.d ${OBJECTDIR}/helper.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/helper.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/helper.o: helper.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/helper.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 helper.c  -o${OBJECTDIR}/helper.o
+	
+${OBJECTDIR}/interrupt.o: interrupt.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/interrupt.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 interrupt.c  -o${OBJECTDIR}/interrupt.o
 	
 else
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/main.p1.d 
-	@${RM} ${OBJECTDIR}/main.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/main.p1  main.c 
-	@-${MV} ${OBJECTDIR}/main.d ${OBJECTDIR}/main.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/main.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/main.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 main.c  -o${OBJECTDIR}/main.o
 	
-${OBJECTDIR}/hw.p1: hw.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/hw.p1.d 
-	@${RM} ${OBJECTDIR}/hw.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/hw.p1  hw.c 
-	@-${MV} ${OBJECTDIR}/hw.d ${OBJECTDIR}/hw.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/hw.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/hw.o: hw.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/hw.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 hw.c  -o${OBJECTDIR}/hw.o
 	
-${OBJECTDIR}/disp.p1: disp.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/disp.p1.d 
-	@${RM} ${OBJECTDIR}/disp.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/disp.p1  disp.c 
-	@-${MV} ${OBJECTDIR}/disp.d ${OBJECTDIR}/disp.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/disp.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/disp.o: disp.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/disp.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 disp.c  -o${OBJECTDIR}/disp.o
 	
-${OBJECTDIR}/helper.p1: helper.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/helper.p1.d 
-	@${RM} ${OBJECTDIR}/helper.p1 
-	${MP_CC} --pass1 $(MP_EXTRA_CC_PRE) --chip=$(MP_PROCESSOR_OPTION) -Q -G  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    -o${OBJECTDIR}/helper.p1  helper.c 
-	@-${MV} ${OBJECTDIR}/helper.d ${OBJECTDIR}/helper.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/helper.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+${OBJECTDIR}/helper.o: helper.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/helper.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 helper.c  -o${OBJECTDIR}/helper.o
 	
-endif
-
-# ------------------------------------------------------------------------------------
-# Rules for buildStep: assemble
-ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-else
+${OBJECTDIR}/interrupt.o: interrupt.c  nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} ${OBJECTDIR} 
+	${RM} ${OBJECTDIR}/interrupt.o 
+	${MP_CC} --use-non-free -c -mpic14 -p16lf1829 interrupt.c  -o${OBJECTDIR}/interrupt.o
+	
 endif
 
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
-	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE) --chip=$(MP_PROCESSOR_OPTION) -G -mdist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.map  -D__DEBUG=1 --debugger=icd3  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"       --memorysummary dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml -odist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}     
-	@${RM} dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.hex 
-	
+	${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
+	${MP_CC}  -Wl-c -Wl-m --use-non-free -mpic14 -p16lf1829 ${OBJECTFILES}  -odist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} 
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
-	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE) --chip=$(MP_PROCESSOR_OPTION) -G -mdist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.map  --double=24 --float=24 --opt=default,+asm,+asmfile,-speed,+space,-debug --addrqual=ignore --mode=free -P -N255 --warn=0 --asmlist --summary=default,-psect,-class,+mem,-hex,-file --output=default,-inhx032 --runtime=default,+clear,+init,-keep,-no_startup,-osccal,-resetbits,-download,-stackcall,+clib --output=-mcof,+elf:multilocs --stack=compiled:auto:auto "--errformat=%f:%l: error: (%n) %s" "--warnformat=%f:%l: warning: (%n) %s" "--msgformat=%f:%l: advisory: (%n) %s"    --memorysummary dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml -odist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}     
-	
+	${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
+	${MP_CC}  -Wl-c -Wl-m --use-non-free -mpic14 -p16lf1829 ${OBJECTFILES}  -odist/${CND_CONF}/${IMAGE_TYPE}/pmm_t1.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} 
 endif
 
 

@@ -7,13 +7,13 @@
 // set of helper routines to handle the floating point numbera 
 //****************************************************************************
 
-int intToStr(int x, char str[], int d);
-void reverse(char *str, int len);
+unsigned char intToStr(int x, char str[], unsigned char d);
+void reverse(char *str, unsigned char len);
 
 // reverses a string 'str' of length 'len'
-void reverse(char *str, int len)
+void reverse(char *str, unsigned char len)
 {
-    int i=0, j=len-1, temp;
+    unsigned char i=0, j=len-1, temp;
     while (i<j)
     {
         temp = str[i];
@@ -26,10 +26,10 @@ void reverse(char *str, int len)
  // Converts a given integer x to string str[].  d is the number
  // of digits required in output. If d is more than the number
  // of digits in x, then 0s are added at the beginning.
-int intToStr(int x, char str[], int d)
+unsigned char intToStr(int x, char str[], unsigned char d)
 {
-    int i = 0;
-	int k = 0;
+    unsigned char i = 0;
+//	unsigned char k = 0;
 	for (i=0;i<50;i++)	//this is ugly, isn't it?
 		{
 		if (x>0)

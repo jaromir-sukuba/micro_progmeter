@@ -18,6 +18,9 @@
 //********************************************************************************************************************
 #include "pic16f1829.h"
 
+#define mTIMER_F_CLR TMR0IF = 0
+#define mGET_ADC        ((((unsigned int)(ADRESH))<<8)|ADRESL)
+
 #define ADC_DELAY __asm__ ("nop");
 
 #define	DISP_PWR	 LATB5
@@ -50,11 +53,23 @@
 #define SSP_RCEN    RCEN
 #define SSP_ACKDT   ACKDT
 #define SSP_ACKEN   ACKEN
+
+#define JOY_BTN_M   RB7
+
+#define ICD_PGD_T     TRISA0
+#define ICD_PGC_T     TRISA1
+
+#define mSLEEP      __asm__ ("sleep");
+#define mRESET      __asm__ ("reset");
+
 #elif defined (COMPILER_XC8)
 //********************************************************************************************************************
 // a lot of defines fot XC8 compiler
 //********************************************************************************************************************
 #include <xc.h>
+
+#define mTIMER_F_CLR INTCONbits.TMR0IF = 0
+#define mGET_ADC        ((((unsigned int)(ADRESH))<<8)|ADRESL)
 
 #define ADC_DELAY   __delay_us(1)
 
@@ -88,6 +103,15 @@
 #define SSP_RCEN    SSP1CON2bits.RCEN
 #define SSP_ACKDT   SSP1CON2bits.ACKDT
 #define SSP_ACKEN   SSP1CON2bits.ACKEN
+
+#define JOY_BTN_M   PORTBbits.RB7
+
+#define ICD_PGD_T     TRISAbits.TRISA0
+#define ICD_PGC_T     TRISAbits.TRISA1
+
+#define mSLEEP      asm("sleep");
+#define mRESET      asm("reset");
+
 #endif
 
 
@@ -99,10 +123,18 @@
 //********************************************************************************************************************
 //********************************************************************************************************************
 
+#define JOY_N   0
+#define JOY_U   1
+#define JOY_D   2
+#define JOY_R   3
+#define JOY_L   4
+#define JOY_M   5
+
 
 
 void hw_init (void);
 void iic_start (void);
+void iic_start_addr (unsigned char address);
 void iic_stop (void);
 void iic_rstart (void);
 void iic_write (unsigned char data);
@@ -115,3 +147,8 @@ void adc_write_reg (unsigned char addr, unsigned char data);
 unsigned char adc_read_reg (unsigned char addr);
 void meter_res_range (unsigned char range);
 
+
+void shdn (void);
+
+void start_adc (unsigned char chnl);
+unsigned int get_adc (void);

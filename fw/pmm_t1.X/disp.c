@@ -95,105 +95,6 @@ const char font5x7[455] =
     0x44, 0x64, 0x54, 0x4C, 0x44};  // z 
 
 
-#define Write_Address 0x78/*slave addresses with write*/
-#define Read_Address 0x79/*slave addresses with read*/
-
-
-void disp_clr (unsigned char data)
-	{
-	unsigned char x,y;
-	for (y=0;y<4;y++)
-		{
-		disp_set_xy(0,y);
-		iic_start();
-		iic_write(Write_Address);
-		iic_write(0x40);
-		for (x=0;x<64;x++)
-			iic_write(data);
-		iic_stop();
-		}	
-	}
-
-void disp_char_print (unsigned char data)
-{
-unsigned char underline;
-unsigned int	disp_loop_var;
-unsigned int temp;
-iic_start();
-iic_write(Write_Address);
-iic_write(0x40);
-if (data&0x80) underline = 1;
-	else underline = 0;
-data = data&0x7F;
-if (data<' ') data = ' ';
-temp = ((unsigned int)(data - 0x20)*5);
-for (disp_loop_var=0;disp_loop_var<5;disp_loop_var++)
-	{
-	if (underline==1)	iic_write(font5x7[temp+disp_loop_var] ^0xFF);	
-	else 				iic_write(font5x7[temp+disp_loop_var] );	
-	}
-if (underline==1)
-	iic_write(0xFF);	
-else
-	iic_write(0x00);	
-iic_stop();
-
-}
-
-void disp_puts(char *data)
-{
-unsigned int counter;
-counter=0;
-while(counter<10)
-	{  
-  	disp_char_print(*data);
-	*data++;
-	counter++;
-  	}
-}
-
-void disp_set_xy (unsigned char x, unsigned char y)
-	{
-	iic_start();
-	iic_write(Write_Address);
-	iic_write(0x80);
-	iic_write(0xb0|(y+32));	
-	x = x + 32;
-	iic_write(0x80);
-	iic_write((0x10|(x>>4)));
-	iic_write(0x80);
-	iic_write((0x0f&x));
-	iic_stop();
-	
-	//disp_set_col(y);
-	//disp_set_page(x);
-	}
-/*
-//0..3
-void disp_set_col (unsigned char add)
-	{
-	add+=32;
-	iic_start();
-	iic_write(Write_Address);
-	iic_write(0x80);
-	iic_write(0xb0|add);
-	iic_stop();
-	}
-
-//0..63
-void disp_set_page (unsigned char add)
-	{
-	add+=32;
-	iic_start();
-	iic_write(Write_Address);
-	iic_write(0x80);
-	iic_write((0x10|(add>>4)));
-	iic_write(0x80);
-	iic_write((0x0f&add));
-	iic_stop();
-	}
-*/
-
 const char init_vals[46] = {
 	0x80,0xae,0x80,0xd5,0x80,0x80,0x80,0xa8,
 	0x80,0x1f,0x80,0xd3,0x80,0x00,0x80,0x8d,
@@ -203,16 +104,77 @@ const char init_vals[46] = {
 	0x80,0xdb,0x80,0x40,0x80,0xaf
 	};
 
+
+void disp_clr (unsigned char data)
+	{
+	unsigned char x,y;
+	for (y=0;y<4;y++)
+		{
+		disp_set_xy(0,y);
+        iic_start_addr(Write_Address);
+		iic_write(0x40);
+		for (x=0;x<64;x++)
+			iic_write(data);
+		iic_stop();
+		}	
+	}
+
+void disp_char_print (unsigned char data)
+{
+unsigned char underline,disp_loop_var;
+unsigned int temp;
+iic_start_addr(Write_Address);
+iic_write(0x40);
+underline = 0;
+if (data&0x80) underline--;		//underflow, so variable underline is 0 or 0xFF here
+data = data&0x7F;
+if (data<' ') data = ' ';
+temp = ((unsigned int)(data - 0x20)*5);
+for (disp_loop_var=0;disp_loop_var<5;disp_loop_var++)
+	iic_write(font5x7[temp+disp_loop_var] ^underline);
+iic_write(underline);	
+iic_stop();
+
+}
+
+void disp_puts(char *data)
+{
+unsigned char counter,eol;
+eol = 1;
+for (counter=0;counter<10;counter++)
+	{
+	if (*data==0) eol = 0;
+  	if (eol) disp_char_print(*data);
+	else disp_char_print(' ');
+	*data++;
+  	}
+}
+
+void disp_set_xy (unsigned char x, unsigned char y)
+	{
+	x = x + 32;
+    y = y + 32;
+    iic_start_addr(Write_Address);
+	iic_write(0x80);
+	iic_write(0xb0|y);	
+	iic_write(0x80);
+	iic_write(0x10|(x>>4));
+	iic_write(0x80);
+	iic_write(0x0f&x);
+	iic_stop();
+	}
+
 void disp_init (void)
 	{
 	unsigned char i;
-	DISP_PWR=0;
+//	DISP_PWR=0;
 	dly_ms(50);
 	DISP_PWR=1;
 	dly_ms(200);
 
-	iic_start();
-	iic_write(Write_Address);
+//	iic_start();
+//	iic_write(Write_Address);
+    iic_start_addr(Write_Address);
 	for (i=0;i<46;i++)
 		iic_write(init_vals[i]);
  	iic_stop();
