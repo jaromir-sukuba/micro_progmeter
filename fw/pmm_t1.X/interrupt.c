@@ -54,21 +54,25 @@ static void interrupt isr(void)
 		}
 	if (interrupt_state==2)
 		{
+		start_adc(7);
 		interrupt_state = 3;
 		return;
 		}
 	if (interrupt_state==3)
 		{
+		batt_adc = mGET_ADC;
 		interrupt_state = 4;
 		return;
 		}
 	if (interrupt_state==4)
 		{
+//		start_adc(9);
 		interrupt_state = 5;
 		return;
 		}
 	if (interrupt_state==5)
 		{
+//		charge_state = ((mGET_ADC)>>2);
 		interrupt_state = 0;
 		return;
 		}

@@ -14,7 +14,7 @@ volatile unsigned char batt_adc, charge_state, joystick_state;
 
 int adc_A, adc_B;
 unsigned char range,main_state,set_x,set_y,i,edit_state,edit_point,clear_flag,calculate_flag;
-float voltage_A, voltage_B, current_A, resistance_A, resistance_X;
+float voltage_A, voltage_B, current_A, resistance_A, resistance_X, batt_volt;
 unsigned char t_str[10];
 float qcorr_A[3];
 float cal_coef[3];
@@ -45,9 +45,9 @@ adc_write_reg (3,0x02);
 adc_write_reg (2,0x10);
 //adc_write_reg (0,0x51);
 
-qcorr_A[0] = -0.00051;
-qcorr_A[1] = -0.00951;
-qcorr_A[2] = 0.0231;
+qcorr_A[0] = -0.00040;
+qcorr_A[1] = -0.00466;
+qcorr_A[2] = 0.0230;
 
 cal_coef[0] = 0.0;
 cal_coef[1] = 61.93;
@@ -162,7 +162,7 @@ while (1)
 		{
         disp_set_xy(0,0);
         disp_puts("edit");
-        disp_set_xy(12,1);
+        disp_set_xy(0,1);
         disp_char_print('0' + edit_point);
         print_meas_val(cal_coef[edit_point],3,3,0,2," ",set_y);
         if (joystick_state!=0)
@@ -231,6 +231,10 @@ while (1)
 		{
         disp_set_xy(0,0);
 		disp_puts("Off  ");
+		disp_set_xy(0,2);
+		batt_adc = (batt_adc/2 - 70) / 3;
+		intToStr(batt_adc,t_str,2);		
+		disp_puts(t_str);
         if (joystick_state!=0)
             {
 			clear_flag = 1;

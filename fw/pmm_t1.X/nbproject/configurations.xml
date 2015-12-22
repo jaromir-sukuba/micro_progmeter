@@ -49,7 +49,7 @@
         </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>true</parseOnProdLoad>
+          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile>dist/default/production/pmm_t1.X.production.hex</alternateLoadableFile>
         </loading>
       </compileType>

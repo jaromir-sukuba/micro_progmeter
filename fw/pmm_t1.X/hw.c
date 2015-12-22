@@ -68,7 +68,6 @@ void hw_init (void)
 	PAN_EN = 1;
 
 	ADC_CS_T = 0;
-	ADC_DO_T = 1;
 	ADC_DI_T = 0;
 	ADC_CLK_T = 0;
 	ADC_CS = 1;
@@ -84,7 +83,6 @@ void hw_init (void)
 	SSP1CON1 = 0x28;
 	SSP1STAT = 0x00;
 	SSP1ADD = SSP_BRG;
-	dly_ms(100);
 /*	
 	T1CON = 0x01;
 	PIE1 = 0x80;
