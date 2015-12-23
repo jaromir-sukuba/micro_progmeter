@@ -7,6 +7,11 @@
 #endif
 
 
+#define CAL_COEF_A -0.00040
+#define CAL_COEF_B -0.00466
+#define CAL_COEF_C  0.0230
+
+
 #define	_XTAL_FREQ	(2000000*1)
 #define	IIC_BAUD	100
 #define	SSP_BRG		((_XTAL_FREQ/4000)/IIC_BAUD)-1

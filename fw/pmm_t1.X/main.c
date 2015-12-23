@@ -45,9 +45,9 @@ adc_write_reg (3,0x02);
 adc_write_reg (2,0x10);
 //adc_write_reg (0,0x51);
 
-qcorr_A[0] = -0.00040;
-qcorr_A[1] = -0.00466;
-qcorr_A[2] = 0.0230;
+qcorr_A[0] = CAL_COEF_A;
+qcorr_A[1] = CAL_COEF_B;
+qcorr_A[2] = CAL_COEF_C;
 
 cal_coef[0] = 0.0;
 cal_coef[1] = 61.93;
